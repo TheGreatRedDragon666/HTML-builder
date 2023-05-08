@@ -7,20 +7,22 @@ const handleErr = function(err) {
     }
 }
 
-function copyDir(dirname) {
-    const pathToFiles = path.join(__dirname, dirname);
-    const pathToTargetDir = path.join(__dirname, `${dirname}-copy`);
+function copyDir(pathToFiles, pathToTargetDir) {
     fs.rm(pathToTargetDir, {recursive: true, force: true}, err => {
         if (err) handleErr();
         fs.mkdir(pathToTargetDir, {recursive: true}, handleErr);
-        fs.readdir(pathToFiles, (err, files) => {
+        fs.readdir(pathToFiles, {withFileTypes: true}, (err, files) => {
             files.forEach(file => {
-                    const pathToSourceFile = path.join(pathToFiles, file);
-                    const pathToTargetFile = path.join(pathToTargetDir, file);
+                const pathToSourceFile = path.join(pathToFiles, file.name);
+                const pathToTargetFile = path.join(pathToTargetDir, file.name);
+                if (file.isDirectory()) {
+                    copyDir(pathToSourceFile, pathToTargetFile);
+                } else if (file.isFile()) {
                     fs.copyFile(pathToSourceFile, pathToTargetFile, handleErr);
+                }
             });
         });
     });
 }
 
-copyDir('files');
+copyDir(path.join(__dirname, 'files'), path.join(__dirname, 'files-copy'));
