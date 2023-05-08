@@ -9,7 +9,7 @@ fs.readdir(pathToSecretFolder, (err, files) => {
         const newPath = path.join(__dirname, 'secret-folder', file);
         fs.stat(newPath, (err, stats) => {
             if (stats.isFile()) {
-                const size = stats.size + 'b';
+                const size = stats.size + 'B';
                 const ext = path.extname(newPath).slice(1);
                 const [ fileName ] = file.split('.');
                 stdout.write(`${fileName} - ${ext} - ${size} \n`)
